@@ -1,0 +1,70 @@
+llm:
+  provider: openai          # openai | anthropic
+  model: gpt-4o-mini        # model name
+  api_key_env: OPENAI_API_KEY  # env var holding the API key
+  temperature: 0.8
+  max_tokens: 2048
+
+sources:
+  awesome_prompts:
+    enabled: true
+    url: "https://raw.githubusercontent.com/f/awesome-chatgpt-prompts/main/prompts.csv"
+
+  github_repos:
+    - repo: "0xeb/TheBigPromptLibrary"
+      paths: ["SystemPrompts"]
+      patterns: ["*.md"]
+      parser: markdown
+
+    - repo: "danielrosehill/System-Prompt-Library"
+      paths: ["system-prompts"]
+      patterns: ["*.json"]
+      parser: json
+
+filters:
+  skill:
+    min_length: 50
+    max_length: 10000
+    min_words: 10
+    ascii_ratio: 0.7
+    blacklist_patterns:
+      - "jailbreak"
+      - "DAN"
+      - "ignore previous"
+      - "bypass"
+      - "pretend you have no restrictions"
+
+  sample:
+    min_instruction_length: 10
+    max_instruction_length: 2000
+    min_response_length: 50
+    max_response_length: 8000
+    refusal_patterns:
+      - "I cannot"
+      - "I'm unable to"
+      - "As an AI"
+      - "I don't have the ability"
+      - "I must decline"
+
+  llm_quality:
+    enabled: true
+    sample_ratio: 0.2
+    min_overall_score: 3.5
+
+synthesis:
+  strategies:
+    - name: direct_task
+      samples_per_skill: 5
+    - name: scenario_based
+      samples_per_skill: 3
+    - name: conversation
+      samples_per_skill: 4
+    - name: edge_case
+      samples_per_skill: 3
+  concurrency: 10
+  temperature: 0.8
+
+output:
+  dir: "data/output"
+  filename: "training_data.jsonl"
+  stats_filename: "stats.json"
